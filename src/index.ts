@@ -1,8 +1,18 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import { enableLiveReload } from "electron-compile";
 import installExtension, {
   REACT_DEVELOPER_TOOLS
 } from "electron-devtools-installer";
+
+import { init } from "./electron-main/actions";
+
+function delegateSync(fn: Function) {
+  return (event: any, ...args: any[]) => {
+    event.returnValue = fn(...args);
+  };
+}
+
+ipcMain.on("init", delegateSync(init));
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
