@@ -1,21 +1,21 @@
-import { ipcRenderer } from "electron";
-import { observable } from "mobx";
-import { observer } from "mobx-react";
-import * as React from "react";
+import { ipcRenderer } from "electron"
+import { observable } from "mobx"
+import { observer } from "mobx-react"
+import * as React from "react"
 
-import { Service } from "../models/service";
+import { Service } from "./service"
 
 @observer
 export class App extends React.Component<{}> {
-  @observable private services: Service[] = ipcRenderer.sendSync("init");
+  @observable private services: string[] = ipcRenderer.sendSync("init")
   public render() {
     if (this.services.length === 0) {
-      return <div>No services could be found for the provided config</div>;
+      return <div>No services could be found for the provided config</div>
     }
     return (
       <div>
-        <h2>Welcome to React with Typescript!</h2>
+        {this.services.map(serviceName => <Service key={name} name={name} />)}
       </div>
-    );
+    )
   }
 }

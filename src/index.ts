@@ -38,7 +38,7 @@ const createWindow = async () => {
         name: "testing-service",
         run: "console.log('Hello, world')",
         send: mainWindow!.webContents.send,
-      }),
+      }).name,
     ]
   })
 
