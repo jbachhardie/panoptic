@@ -14,7 +14,9 @@ export class App extends React.Component<{}> {
     }
     return (
       <div>
-        {this.services.map(serviceName => <Service key={name} name={name} />)}
+        {this.services.map(serviceName => (
+          <Service key={serviceName} name={serviceName} />
+        ))}
       </div>
     )
   }

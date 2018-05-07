@@ -26,21 +26,28 @@ export class Service extends React.Component<IServiceProps> {
 
   constructor(props: IServiceProps) {
     super(props)
-    ipcRenderer.on(name, (event: string, ...args: any[]) => {
+    ipcRenderer.on(this.props.name, (event: string, ...args: any[]) => {
       switch (event) {
         case "diagnostic":
           this.diagnostic(args[0])
           break
         case "log-raw":
           this.log("info", ...args)
+          break
         default:
           break
       }
     })
+    ipcRenderer.send("service:start", this.props.name)
   }
 
   public render() {
-    return this.logs.map(logItem => <ObjectInspector data={logItem} />)
+    return (
+      <div>
+        <h1>{this.props.name}</h1>
+        {this.logs.map(logItem => <ObjectInspector data={logItem} />)}
+      </div>
+    )
   }
 
   @action.bound

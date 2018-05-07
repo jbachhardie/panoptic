@@ -6,6 +6,13 @@ import installExtension, {
 
 import { ServiceController } from "./electron-main/service-controller"
 
+const services = [
+  new ServiceController({
+    name: "testing-service",
+    run: "console.log('Hello, world')",
+  }),
+]
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: Electron.BrowserWindow | null = null
@@ -32,14 +39,15 @@ const createWindow = async () => {
     mainWindow.webContents.openDevTools()
   }
 
-  ipcMain.on("init", event => {
-    event.returnValue = [
-      new ServiceController({
-        name: "testing-service",
-        run: "console.log('Hello, world')",
-        send: mainWindow!.webContents.send,
-      }).name,
-    ]
+  ipcMain.on("init", (event: any) => {
+    event.returnValue = services.map(service => service.name)
+  })
+  ipcMain.on("service:start", (_: any, serviceName: string) => {
+    if (mainWindow) {
+      services
+        .find(service => service.name === serviceName)!
+        .start(mainWindow.webContents)
+    }
   })
 
   // Emitted when the window is closed.
