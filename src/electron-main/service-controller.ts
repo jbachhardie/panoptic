@@ -1,46 +1,33 @@
+import { ChildProcess, fork } from "child_process"
 import { ipcMain, WebContents } from "electron"
-import { EventEmitter2 } from "eventemitter2"
-import { Context, createContext, Script } from "vm"
 
 export interface IServiceControllerConfiguration {
   name: string
-  run: string
+  serviceModule: string
 }
 
 export class ServiceController {
   public name: string
-  private script: Script
-  private eventHandler: EventEmitter2
+  private serviceModule: string
+  private process: ChildProcess
 
-  constructor({ run, name }: IServiceControllerConfiguration) {
+  constructor({ serviceModule, name }: IServiceControllerConfiguration) {
     this.name = name
-    this.script = new Script(run)
+    this.serviceModule = serviceModule
   }
 
   public start(webContents: WebContents) {
-    const delegate = (eventName: string) => (...args: any[]) =>
-      webContents.send(this.name, eventName, ...args)
-    this.eventHandler = new EventEmitter2()
-    this.eventHandler.onAny((eventName, ...args) =>
-      webContents.send(this.name, eventName, ...args)
+    if (this.process) {
+      return
+    }
+    this.process = fork(
+      require.resolve("./service-shell"),
+      [this.serviceModule],
+      {
+        silent: true,
+      }
     )
-    ipcMain.on(this.name, (eventName: string, ...args: any[]) =>
-      this.eventHandler.emit(eventName, ...args)
-    )
-    webContents.send(this.name, "log-raw", "Initialised")
-    this.eventHandler.emit("log-raw", "Started!")
-    this.script.runInNewContext(
-      createContext({
-        ...global,
-        console: {
-          debug: delegate("log-debug"),
-          error: delegate("log-error"),
-          info: delegate("log-info"),
-          log: delegate("log-raw"),
-          warn: delegate("log-warn"),
-        },
-        panoptic: this.eventHandler,
-      })
-    )
+    this.process.on("message", message => webContents.send(this.name, message))
+    ipcMain.on(this.name, (message: any) => this.process.send(message))
   }
 }

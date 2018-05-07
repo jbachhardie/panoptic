@@ -8,8 +8,8 @@ import { ServiceController } from "./electron-main/service-controller"
 
 const services = [
   new ServiceController({
-    name: "testing-service",
-    run: "console.log('Hello, world')",
+    name: "pinger",
+    serviceModule: require.resolve("../example/services/pinger"),
   }),
 ]
 

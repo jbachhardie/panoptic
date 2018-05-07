@@ -1,5 +1,6 @@
 import { ipcRenderer } from "electron"
 import { action, observable } from "mobx"
+import { observer } from "mobx-react"
 import * as React from "react"
 import { ObjectInspector } from "react-inspector"
 
@@ -20,19 +21,20 @@ export interface IServiceProps {
   name: string
 }
 
+@observer
 export class Service extends React.Component<IServiceProps> {
-  @observable private diagnostics: IDiagnostic[] = []
-  @observable private logs: any[] = []
+  @observable.shallow private diagnostics: IDiagnostic[] = []
+  @observable.shallow private logs: any[] = []
 
   constructor(props: IServiceProps) {
     super(props)
-    ipcRenderer.on(this.props.name, (event: string, ...args: any[]) => {
-      switch (event) {
+    ipcRenderer.on(this.props.name, (_: any, { eventName, ...args }: any) => {
+      switch (eventName) {
         case "diagnostic":
-          this.diagnostic(args[0])
+          args.disagnostics.forEach(this.diagnostic)
           break
         case "log-raw":
-          this.log("info", ...args)
+          this.log("info", args.message)
           break
         default:
           break
@@ -51,8 +53,8 @@ export class Service extends React.Component<IServiceProps> {
   }
 
   @action.bound
-  private log(level: string, ...items: any[]) {
-    this.logs.concat(items)
+  private log(level: string, message: any) {
+    this.logs.push(message)
   }
 
   @action.bound
