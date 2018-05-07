@@ -7,7 +7,6 @@ console.info = delegate("log-info")
 console.log = delegate("log-raw")
 console.warn = delegate("log-warn")
 
-process.send({ eventName: "log-raw", message: "Started" })
-console.log("Started service")
+console.debug("Service started")
 
 require(process.argv[process.argv.length - 1])
