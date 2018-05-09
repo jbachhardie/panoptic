@@ -9,4 +9,12 @@ console.warn = delegate("log-warn")
 
 console.debug("Service started")
 
+setInterval(() => {
+  process.send({
+    eventName: "stats",
+    ...process.cpuUsage(),
+    ...process.memoryUsage(),
+  })
+}, 1000)
+
 require(process.argv[process.argv.length - 1])

@@ -40,6 +40,7 @@ export class Service {
         "log-info": () => this.log("info", args.message),
         "log-raw": () => this.log("info", args.message),
         "log-warn": () => this.log("warn", args.message),
+        stats: () => this.log("debug", args),
       }[eventName]()
     })
     ipcRenderer.send("service:start", name)
