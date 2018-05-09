@@ -1,21 +1,11 @@
-import { Error, Info, InfoOutline, Warning } from "@material-ui/icons"
 import { ipcRenderer } from "electron"
-import {
-  AppBar,
-  Tab,
-  Tabs,
-  List,
-  ListItem,
-  ListItemIcon,
-  CssBaseline,
-  Paper,
-} from "material-ui"
+import { AppBar, CssBaseline, Tab, Tabs } from "material-ui"
 import { observable } from "mobx"
 import { observer } from "mobx-react"
 import * as React from "react"
-import { ObjectInspector } from "react-inspector"
 
 import { Service } from "../model/service"
+import { ServicePanel } from "./service-panel"
 
 @observer
 export class App extends React.Component<{}> {
@@ -42,24 +32,8 @@ export class App extends React.Component<{}> {
             ))}
           </Tabs>
         </AppBar>
-        <List component="div" style={{ maxHeight: "100%", overflow: "auto" }}>
-          {this.services[this.currentTab].logs.map(
-            ({ level, message }, index) => (
-              <ListItem key={index} component="div">
-                <ListItemIcon>{logIcons[level]}</ListItemIcon>
-                <ObjectInspector data={message} />
-              </ListItem>
-            )
-          )}
-        </List>
+        <ServicePanel service={this.services[this.currentTab]} />
       </div>
     )
   }
-}
-
-const logIcons = {
-  debug: <InfoOutline />,
-  error: <Error />,
-  info: <Info />,
-  warn: <Warning />,
 }
