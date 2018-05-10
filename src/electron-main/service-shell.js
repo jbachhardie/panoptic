@@ -12,8 +12,8 @@ console.debug("Service started")
 setInterval(() => {
   process.send({
     eventName: "stats",
-    ...process.cpuUsage(),
-    ...process.memoryUsage(),
+    cpu: process.cpuUsage(),
+    memory: process.memoryUsage(),
   })
 }, 1000)
 

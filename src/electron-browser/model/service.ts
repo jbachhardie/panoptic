@@ -1,5 +1,7 @@
 import { ipcRenderer } from "electron"
 import { action, observable } from "mobx"
+import { forEachObjIndexed, pipe } from "ramda"
+import { Metric } from "./metric"
 
 export interface ICodeLocation {
   line: number
@@ -29,21 +31,27 @@ export class Service {
   public name: string
   @observable.shallow public diagnostics: IDiagnostic[] = []
   @observable.shallow public logs: ILog[] = []
+  @observable.shallow public cpuMetrics: Metric[] = []
+  @observable.shallow public memoryMetrics: Metric[] = []
 
   constructor({ name }: IServiceProps) {
     this.name = name
     ipcRenderer.on(name, (_: any, { eventName, ...args }: any) => {
       return {
-        diagnostic: () => args.diagnostics.forEach(this.diagnostic),
-        "log-debug": () => this.log("debug", args.message),
-        "log-error": () => this.log("error", args.message),
-        "log-info": () => this.log("info", args.message),
-        "log-raw": () => this.log("info", args.message),
-        "log-warn": () => this.log("warn", args.message),
-        stats: () => this.log("debug", args),
-      }[eventName]()
+        "log-debug": ({ message }) => this.log("debug", message),
+        "log-error": ({ message }) => this.log("error", message),
+        "log-info": ({ message }) => this.log("info", message),
+        "log-raw": ({ message }) => this.log("info", message),
+        "log-warn": ({ message }) => this.log("warn", message),
+        stats: ({ cpu, memory }) => forEachObjIndexed(),
+      }[eventName](args)
     })
     ipcRenderer.send("service:start", name)
+  }
+
+  @action.bound
+  private stats({ cpu, memory }: IPerformanceStats) {
+    this.performanceStats.push({ timestamp: new Date(), cpu, memory })
   }
 
   @action.bound
@@ -53,10 +61,5 @@ export class Service {
     } else {
       this.logs.push({ level, message })
     }
-  }
-
-  @action.bound
-  private diagnostic(diagnostic: IDiagnostic) {
-    this.diagnostics.push(diagnostic)
   }
 }
