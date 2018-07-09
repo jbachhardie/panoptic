@@ -1,5 +1,5 @@
 import { Error, Info, InfoOutline, Warning } from "@material-ui/icons"
-import { List, ListItem, ListItemIcon } from "material-ui"
+import { List, ListItem, ListItemIcon } from "@material-ui/core"
 import { observer } from "mobx-react"
 import * as React from "react"
 import { ObjectInspector } from "react-inspector"

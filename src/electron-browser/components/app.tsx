@@ -1,5 +1,5 @@
+import { AppBar, CssBaseline, Tab, Tabs } from "@material-ui/core"
 import { ipcRenderer } from "electron"
-import { AppBar, CssBaseline, Tab, Tabs } from "material-ui"
 import { observable } from "mobx"
 import { observer } from "mobx-react"
 import * as React from "react"

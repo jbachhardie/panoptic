@@ -1,4 +1,4 @@
-import { Tab, Tabs } from "material-ui"
+import { Tab, Tabs } from "@material-ui/core"
 import { observable } from "mobx"
 import { observer } from "mobx-react"
 import * as React from "react"
